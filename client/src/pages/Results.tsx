@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getRun } from "../api";
+import { getRun, streamUrl } from "../api";
 import type { RunManifest } from "../types";
 import LoadingScreen from "../components/LoadingScreen";
 import LogStream from "../components/LogStream";
@@ -41,7 +41,7 @@ export default function Results() {
   useEffect(() => {
     if (!runId) return;
 
-    const source = new EventSource(`/api/runs/${runId}/stream`);
+    const source = new EventSource(streamUrl(runId));
     sourceRef.current = source;
 
     source.onmessage = (ev) => {
