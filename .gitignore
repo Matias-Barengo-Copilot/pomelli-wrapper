@@ -7,3 +7,5 @@ google-session.json
 spike-output/
 server.log
 .claude/settings.local.json
+
+.vercel
