@@ -1,0 +1,50 @@
+{
+  "name": "pomelli-wrapper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "wrap": "tsx src/cli.ts",
+    "login": "tsx src/cli/login.ts",
+    "server": "tsx src/server.ts",
+    "server:dev": "cross-env PORT=3001 tsx watch src/server.ts",
+    "client:dev": "vite",
+    "client:build": "vite build",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "spike": "tsx scripts/spike-playwright.ts",
+    "explore": "tsx scripts/explore-pomelli.ts",
+    "test-overview": "tsx scripts/test-extract-overview.ts",
+    "explore-sidebar": "tsx scripts/explore-sidebar.ts",
+    "explore-delete": "tsx scripts/explore-delete-brand.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.0.0",
+    "express": "^5.2.1",
+    "puppeteer-core": "^25.0.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1",
+    "uuid": "latest",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "playwright": "^1.60.0",
+    "tailwindcss": "^4.3.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^8.0.13"
+  }
+}

@@ -1,0 +1,38 @@
+=== Delete Brand DOM Report ===
+
+## All Buttons
+
+[000] text: "menu" | aria-label: "" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base nav-button mat-unthemed"
+[001] text: "more_vert" | aria-label: "" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-menu-trigger button mat-unthemed"
+[002] text: "Dismiss" | aria-label: "" | classes: "mdc-button mat-mdc-button-base mat-mdc-button mat-unthemed"
+[003] text: "menu" | aria-label: "" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base nav-button mat-unthemed"
+[004] text: "right_panel_close Open sidebar" | aria-label: "" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base expand-button mat-unthemed"
+[005] text: "delete_forever Reset" | aria-label: "" | classes: "mdc-button mat-mdc-button-base bottom-button body-large secondary-surface mdc-button--unelevated mat-mdc-unelevated-butt"
+[006] text: "book_4_spark Create Brand Book" | aria-label: "" | classes: "mdc-button mat-mdc-button-base bottom-button body-large mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed"
+[007] text: "project_box_spark Create Website" | aria-label: "" | classes: "mdc-button mat-mdc-button-base mat-mdc-tooltip-trigger bottom-button body-large mdc-button--unelevated mat-mdc-unelevate"
+[008] text: "close" | aria-label: "Close chat" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base chat-close-btn mat-unthemed"
+[009] text: "mic" | aria-label: "Use voice input" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base voice-button mat-mdc-button-disabled mat-unthemed"
+[010] text: "send_spark" | aria-label: "Send message" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-tooltip-trigger prompt-send-button mat-mdc-button-disabl"
+[011] text: "agent_mode" | aria-label: "Open chat" | classes: "chat-reopen-btn"
+
+
+## Mat Menu Trigger Results
+
+
+### Menu trigger 0: "more_vert"
+    • "delete_forever Reset BusinessDNA"
+    • "download Download Business Data"
+    • "manage_accounts Account Settings"
+    • "apps Connected Apps"
+    • "privacy_tip Privacy Notice"
+    • "Google Labs Discord"
+    • "feedback Send Feedback"
+    • "report Report legal issue"
+    • "book Help Center"
+
+
+## Elements with delete/reset keywords
+
+  tag: button | text: "delete_forever
+Reset" | classes: "mdc-button mat-mdc-button-base bottom-button body-large secondary-surface mdc-button--unelevated mat-mdc-unelevated-butt"
+  tag: mat-icon | text: "delete_forever" | classes: "mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color"

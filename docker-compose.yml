@@ -1,0 +1,18 @@
+services:
+  pomelli-computer:
+    build: .
+    container_name: pomelli-computer
+    environment:
+      - WIDTH=1280
+      - HEIGHT=800
+    ports:
+      - "5902:5900"      # VNC — connect with any VNC viewer at localhost:5902
+      - "9222:9223"      # Firefox CDP — socat bridges 0.0.0.0:9223 → 127.0.0.1:9222 (Firefox binds loopback only)
+    volumes:
+      - firefox-profile:/firefox-profile   # Persistent Firefox profile (login survives restarts)
+    restart: unless-stopped
+    shm_size: "2gb"      # Firefox needs shared memory
+
+volumes:
+  firefox-profile:
+    name: firefox-profile

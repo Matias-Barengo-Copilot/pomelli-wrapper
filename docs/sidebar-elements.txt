@@ -1,0 +1,180 @@
+=== Nav element analysis ===
+
+
+### "Business DNA"
+  tag:      div.nav-group.has-flyout
+  text:     "genetics\nBusiness DNA\nBusiness DNA\nOverview\nCatalog\nAssets\nOverview\nOverview\nCatalog\nCatalog\nAssets\nAssets"
+  href:     (none)
+  role:     (none)
+  tabindex: 0
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.nav-item
+  text:     "genetics\nBusiness DNA\nBusiness DNA\nOverview\nCatalog\nAssets"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.label.title-medium.on-surface-variant
+  text:     "Business DNA"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.flyout
+  text:     "Business DNA\nOverview\nCatalog\nAssets"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.flyout-title.title-small
+  text:     "Business DNA"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.section-container
+  text:     "Suggestions based on Business DNA\nLet Pomelli generate some suggested campaigns for you based on your current Business D"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+
+### "Campaigns"
+  tag:      div.nav-item
+  text:     "smart_campaign\nCampaigns\nCampaigns"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      span.tooltip.body-small
+  text:     "Campaigns"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.label.title-medium.on-surface-variant
+  text:     "Campaigns"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      app-page-header
+  text:     "Campaigns\nStart from our suggestions or prompt to create a new campaign."
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.page-header
+  text:     "Campaigns\nStart from our suggestions or prompt to create a new campaign."
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.title.display-small-stylized.on-surface
+  text:     "Campaigns"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+
+### "Photoshoot"
+  tag:      div.nav-item
+  text:     "camera_filter_auto\nPhotoshoot\nPhotoshoot"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      span.tooltip.body-small
+  text:     "Photoshoot"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.label.title-medium.on-surface-variant
+  text:     "Photoshoot"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+
+### "Brand Book"
+  tag:      div.nav-item
+  text:     "book_5\nBrand Book\nBrand Book\nNew"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      span.tooltip.body-small
+  text:     "Brand Book"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.label.title-medium.on-surface-variant
+  text:     "Brand Book\nNew"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+
+### "Websites"
+  tag:      div.nav-item
+  text:     "project_box_spark\nWebsites\nWebsites\nNew"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      span.tooltip.body-small
+  text:     "Websites"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+  tag:      div.label.title-medium.on-surface-variant
+  text:     "Websites\nNew"
+  href:     (none)
+  role:     (none)
+  tabindex: (none)
+  ng-reflect-router-link: (none)
+  ---
+
+
+### All <button> elements (first 30)
+  text: "menu" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base nav-button mat-unthemed"
+  text: "more_vert" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base mat-mdc-menu-trigger button mat-unthemed"
+  text: "Dismiss" | classes: "mdc-button mat-mdc-button-base mat-mdc-button mat-unthemed"
+  text: "menu" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base nav-button mat-unthemed"
+  text: "right_panel_open
+Close sidebar" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base expand-button mat-unthemed cdk-focused cdk-mouse-focused"
+  text: "mic" | classes: "mdc-icon-button mat-mdc-icon-button mat-mdc-button-base voice-button mat-unthemed mat-mdc-button-disabled"
+  text: "shopping_bag
+Product" | classes: "mdc-button mat-mdc-button-base mat-mdc-tooltip-trigger ingredient-button mat-tonal-button mat-unthemed mat-mdc-button-disabled"
+  text: "image
+Images" | classes: "mdc-button mat-mdc-button-base ingredient-button mat-tonal-button mat-unthemed mat-mdc-button-disabled"
+  text: "aspect_ratio
+Aspect Ratio
+arrow_drop_down" | classes: "mdc-button mat-mdc-button-base mat-mdc-menu-trigger aspect-ratio-button mat-tonal-button mat-unthemed"
+  text: "auto_awesome
+Generate Brief" | classes: "mdc-button mat-mdc-button-base prompt-send-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-disabled"
+  text: "auto_awesome
+Suggest campaigns" | classes: "mdc-fab mat-mdc-fab-base mat-mdc-fab mat-mdc-button-base generate-button mat-accent mdc-fab--extended mat-mdc-extended-fab"

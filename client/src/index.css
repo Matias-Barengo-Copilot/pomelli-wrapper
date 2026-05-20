@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+body {
+  background-color: rgb(3 7 18); /* gray-950 */
+  color: #fff;
+}
+
+/* Smooth transitions for milestone animations */
+* { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
