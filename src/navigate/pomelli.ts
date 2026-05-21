@@ -221,8 +221,11 @@ async function ensureSidebarExpanded(page: Page, log: (msg: string) => void): Pr
   const isExpanded = await page.locator("nav.nav-container.expanded").count() > 0;
   log(`  [${ts()}] sidebar expanded: ${isExpanded}`);
   if (!isExpanded) {
-    log(`  [${ts()}] expanding sidebar (button.expand-button)…`);
-    await page.locator("button.expand-button").first().click({ timeout: 5_000 });
+    log(`  [${ts()}] waiting for button.expand-button to appear…`);
+    // After DNA generation the sidebar may still be rendering — wait up to 15s
+    await page.locator("button.expand-button").first().waitFor({ state: "visible", timeout: 15_000 });
+    log(`  [${ts()}] expanding sidebar…`);
+    await page.locator("button.expand-button").first().click({ force: true, timeout: 5_000 });
     await sleep(700);
     log(`  [${ts()}] ✓ sidebar expanded`);
   }
@@ -348,6 +351,8 @@ export async function driveToReadyState(
             return "content_ready";
           }
 
+          // Give the page a moment to finish rendering before looking for the sidebar
+          await sleep(2000);
           await ensureSidebarExpanded(page, log);
 
           log(`  [${ts()}] clicking div.nav-group.has-flyout (Business DNA nav group)…`);
