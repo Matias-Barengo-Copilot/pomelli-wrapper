@@ -9,12 +9,27 @@ import { spawn, type ChildProcess } from "child_process";
 
 import { VALID_SECTIONS, type PlaSection } from "./navigate/pomelli.js";
 import { runWrap, DEFAULT_SESSION_PATH, DEFAULT_OUTPUTS_DIR, DEFAULT_SECTIONS, type RunManifest } from "./runner.js";
+import { uploadRun, publicUrl, listRuns, fetchManifest } from "./lib/supabase-storage.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CLIENT_DIST = path.resolve(__dirname, "../client/dist");
 const OUTPUTS_DIR = process.env.OUTPUTS_DIR
   ? path.resolve(process.env.OUTPUTS_DIR)
   : DEFAULT_OUTPUTS_DIR;
+
+// ── Decode Google session from env var (production/Render) ─────────────────
+// Set GOOGLE_SESSION_B64 = base64-encoded contents of google-session.json
+if (process.env.GOOGLE_SESSION_B64 && !fs.existsSync(DEFAULT_SESSION_PATH)) {
+  try {
+    fs.writeFileSync(
+      DEFAULT_SESSION_PATH,
+      Buffer.from(process.env.GOOGLE_SESSION_B64, "base64").toString("utf-8"),
+    );
+    console.log("[startup] google-session.json decoded from GOOGLE_SESSION_B64");
+  } catch (err) {
+    console.error("[startup] Failed to decode GOOGLE_SESSION_B64:", err);
+  }
+}
 
 // ── Login process state ────────────────────────────────────────────────────
 
@@ -37,6 +52,12 @@ let activeRun: ActiveRun | null = null;
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ── GET /api/health — cold-start probe ────────────────────────────────────
+
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true });
+});
 
 // ── POST /api/runs — start a run ───────────────────────────────────────────
 
@@ -97,10 +118,17 @@ app.post("/api/runs", (req, res) => {
     headless: true,
     sessionPath: DEFAULT_SESSION_PATH,
     log: appendLog,
-  }).then(manifest => {
+  }).then(async manifest => {
     pendingRun.runId    = manifest.runId;
     pendingRun.status   = manifest.status;
     pendingRun.manifest = manifest;
+    // Upload to Supabase before emitting done so the client can access files immediately
+    if (process.env.SUPABASE_URL) {
+      const runDir = path.join(OUTPUTS_DIR, manifest.runId);
+      await uploadRun(runDir, manifest.runId, appendLog).catch(err => {
+        appendLog(`[supabase] upload error: ${err instanceof Error ? err.message : err}`);
+      });
+    }
     emitter.emit("done", { status: manifest.status, runId: manifest.runId });
   }).catch(err => {
     const msg = err instanceof Error ? err.message : String(err);
@@ -117,7 +145,7 @@ app.post("/api/runs", (req, res) => {
 
 // ── GET /api/runs/:runId/stream — SSE log stream ───────────────────────────
 
-app.get("/api/runs/:runId/stream", (req, res) => {
+app.get("/api/runs/:runId/stream", async (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -135,7 +163,7 @@ app.get("/api/runs/:runId/stream", (req, res) => {
     : null;
 
   if (!run) {
-    // Past run — check disk
+    // Past run — check local disk first, then Supabase
     const manifestPath = path.join(OUTPUTS_DIR, runId, "manifest.json");
     if (fs.existsSync(manifestPath)) {
       try {
@@ -144,6 +172,10 @@ app.get("/api/runs/:runId/stream", (req, res) => {
       } catch {
         send("error", { message: "Corrupt manifest" });
       }
+    } else if (process.env.SUPABASE_URL) {
+      const m = await fetchManifest(runId);
+      if (m) send("done", { status: m.status, runId: m.runId });
+      else    send("error", { message: "Run not found" });
     } else {
       send("error", { message: "Run not found" });
     }
@@ -178,7 +210,7 @@ app.get("/api/runs/:runId/stream", (req, res) => {
 
 // ── GET /api/runs/:runId — manifest ───────────────────────────────────────
 
-app.get("/api/runs/:runId", (req, res) => {
+app.get("/api/runs/:runId", async (req, res) => {
   const { runId } = req.params;
 
   if (runId === "current" && activeRun?.manifest) {
@@ -192,20 +224,54 @@ app.get("/api/runs/:runId", (req, res) => {
   }
 
   const manifestPath = path.join(OUTPUTS_DIR, runId, "manifest.json");
-  if (!fs.existsSync(manifestPath)) {
-    res.status(404).json({ error: "Run not found" });
-    return;
+  if (fs.existsSync(manifestPath)) {
+    try {
+      res.json(JSON.parse(fs.readFileSync(manifestPath, "utf-8")));
+      return;
+    } catch {
+      // fall through to Supabase
+    }
   }
-  try {
-    res.json(JSON.parse(fs.readFileSync(manifestPath, "utf-8")));
-  } catch {
-    res.status(500).json({ error: "Corrupt manifest" });
+
+  if (process.env.SUPABASE_URL) {
+    const m = await fetchManifest(runId);
+    if (m) { res.json(m); return; }
   }
+
+  res.status(404).json({ error: "Run not found" });
 });
 
 // ── GET /api/runs — list past runs ────────────────────────────────────────
 
-app.get("/api/runs", (_req, res) => {
+app.get("/api/runs", async (_req, res) => {
+  // Production (Render): filesystem is ephemeral, read history from Supabase
+  if (process.env.SUPABASE_URL) {
+    try {
+      const runIds   = await listRuns();
+      const manifests = await Promise.all(runIds.map(id => fetchManifest(id)));
+      const summaries = manifests
+        .flatMap(m => {
+          if (!m?.runId || !m.brandUrl) return [];
+          const totalAssets = (m.sections ?? []).reduce((n, s) => n + (s.assetCount ?? 0), 0);
+          return [{
+            runId:       m.runId,
+            brandUrl:    m.brandUrl,
+            brandName:   m.overview?.brandName ?? null,
+            startedAt:   m.startedAt,
+            completedAt: m.completedAt,
+            status:      m.status,
+            totalAssets,
+          }];
+        })
+        .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+      res.json(summaries);
+      return;
+    } catch {
+      // Fall through to local disk on Supabase error
+    }
+  }
+
+  // Dev / local: read from disk
   if (!fs.existsSync(OUTPUTS_DIR)) {
     res.json([]);
     return;
@@ -221,7 +287,7 @@ app.get("/api/runs", (_req, res) => {
     if (!fs.existsSync(manifestPath)) return [];
     try {
       const m = JSON.parse(fs.readFileSync(manifestPath, "utf-8")) as RunManifest;
-      if (!m.runId || !m.brandUrl) return [];   // skip malformed/incomplete manifests
+      if (!m.runId || !m.brandUrl) return [];
       const totalAssets = (m.sections ?? []).reduce((n, s) => n + (s.assetCount ?? 0), 0);
       return [{
         runId:       m.runId,
@@ -258,6 +324,12 @@ app.get("/api/runs/:runId/file/*filePath", (req, res) => {
   if (!resolvedFile.startsWith(resolvedBase + path.sep) && resolvedFile !== resolvedBase) {
     res.status(403).json({ error: "Access denied" });
     return;
+  }
+
+  // In production, redirect to Supabase public URL
+  if (process.env.SUPABASE_URL) {
+    const url = publicUrl(runId, parts.join("/"));
+    if (url) { res.redirect(302, url); return; }
   }
 
   if (!fs.existsSync(resolvedFile)) {

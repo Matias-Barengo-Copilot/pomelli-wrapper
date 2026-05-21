@@ -50,6 +50,19 @@ export async function confirmLogin(): Promise<void> {
   if (!res.ok) throw new Error("Failed to confirm login");
 }
 
+/** Ping the health endpoint. Returns true if the server responds within timeoutMs. */
+export async function pingHealth(timeoutMs = 3000): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const res = await fetch(`${API}/api/health`, { signal: controller.signal });
+    clearTimeout(timer);
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function pollSession(intervalMs = 2000, maxAttempts = 30): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, intervalMs));

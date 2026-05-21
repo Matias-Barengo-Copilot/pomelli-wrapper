@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import Results from "./pages/Results";
 import History from "./pages/History";
+import WakeupScreen from "./components/WakeupScreen";
+import { pingHealth } from "./api";
 
 function Nav() {
   const { pathname } = useLocation();
@@ -27,7 +30,52 @@ function Nav() {
   );
 }
 
+/**
+ * On first render, ping /api/health with a 2.5s timeout.
+ * - Responds quickly  → server was already awake, show the app normally (no screen shown).
+ * - Times out         → Render is sleeping; show WakeupScreen and retry every 4s until healthy.
+ * null = still checking (initial ping in flight — app renders normally to avoid a blank flash).
+ */
+function useServerReady(): boolean | null {
+  const [ready, setReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    let retryTimer: ReturnType<typeof setInterval>;
+
+    pingHealth(2500).then(ok => {
+      if (cancelled) return;
+      setReady(ok);
+      if (!ok) {
+        retryTimer = setInterval(() => {
+          pingHealth(8000).then(ok => {
+            if (ok && !cancelled) {
+              clearInterval(retryTimer);
+              setReady(true);
+            }
+          });
+        }, 4000);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      clearInterval(retryTimer);
+    };
+  }, []);
+
+  return ready;
+}
+
 export default function App() {
+  const serverReady = useServerReady();
+
+  // Server confirmed sleeping → show wakeup screen until it responds
+  if (serverReady === false) {
+    return <WakeupScreen />;
+  }
+
+  // null (initial ping in flight) or true → render the app normally
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-950">
