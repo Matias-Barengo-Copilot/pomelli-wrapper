@@ -137,6 +137,12 @@ export async function deleteBrandIfPresent(
     log(`  [${ts()}] waiting for section modal to close…`);
     await page.waitForFunction(() => !document.querySelector(".option-card"), { timeout: 3 * 60 * 1000 });
     await sleep(2000);
+    // Dismiss any welcome popup that appears right after the section loads
+    if (await page.locator("button[cdkfocusinitial]").count() > 0) {
+      log(`  [${ts()}] popup after card click — dismissing…`);
+      await page.locator("button[cdkfocusinitial]").first().click({ force: true, timeout: 10_000 });
+      await sleep(600);
+    }
     state = await detectState(page);
     log(`  [${ts()}] state after card click: ${state}`);
   }
@@ -213,7 +219,13 @@ export async function navigateToBusinessDnaSubTab(
   await page.locator("div.nav-group.has-flyout").first().waitFor({ state: "visible", timeout: 10_000 });
   log(`  [${ts()}] clicking div.nav-group.has-flyout to expand Business DNA sub-items…`);
   await page.locator("div.nav-group.has-flyout").first().click({ force: true, timeout: 5_000 });
-  await sleep(500);
+
+  // Wait for the flyout animation to finish and sub-items to become visible
+  log(`  [${ts()}] waiting for Business DNA "${subTab}" sub-item to be visible…`);
+  await page
+    .locator("div.nav-item.sub-item", { hasText: subTab })
+    .first()
+    .waitFor({ state: "visible", timeout: 5_000 });
 
   log(`  [${ts()}] clicking Business DNA "${subTab}" sub-item…`);
   await page
