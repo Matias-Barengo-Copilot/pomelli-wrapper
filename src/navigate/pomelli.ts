@@ -80,7 +80,7 @@ export async function deleteBrandIfPresent(
     if (/try again later|limit|quota|no more|exhausted|out of/i.test(dialogText)) {
       throw new Error(`Pomelli rate limit / quota reached: "${dialogText.slice(0, 300)}"`);
     }
-    await page.locator("button[cdkfocusinitial]").first().click({ timeout: 10_000 });
+    await page.locator("button[cdkfocusinitial]").first().click({ force: true, timeout: 10_000 });
     await sleep(600);
   }
 
@@ -165,7 +165,7 @@ export async function deleteBrandIfPresent(
     }
     if (s === "welcome_popup") {
       log(`  [${ts()}] popup appeared post-reset — dismissing…`);
-      await page.locator("button[cdkfocusinitial]").first().click({ timeout: 5_000 }).catch(() => {});
+      await page.locator("button[cdkfocusinitial]").first().click({ force: true, timeout: 5_000 }).catch(() => {});
       await sleep(500);
     } else {
       log(`  [${ts()}] state "${s}" — still waiting…`);
@@ -283,7 +283,7 @@ export async function driveToReadyState(
           throw new Error(`Pomelli rate limit / quota reached: "${dialogText.slice(0, 300)}"`);
         }
         log(`  [${ts()}] clicking button[cdkfocusinitial] (Okay / dismiss)…`);
-        await page.locator("button[cdkfocusinitial]").first().click({ timeout: 10_000 });
+        await page.locator("button[cdkfocusinitial]").first().click({ force: true, timeout: 10_000 });
         log(`  [${ts()}] ✓ popup dismissed`);
         await sleep(600);
         break;
