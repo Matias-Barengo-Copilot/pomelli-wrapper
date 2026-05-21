@@ -118,14 +118,27 @@ export async function deleteBrandIfPresent(
     }
   }
 
-  // On the dna_summary page the left nav sidebar is not rendered — it only
-  // appears after entering the main Pomelli app. Click "Let's go" first.
+  // The sidebar nav only renders after entering the main Pomelli app (content_ready).
+  // Drive there step by step so we can use the nav to reach the Reset button.
+
+  // dna_summary → click Let's go → section_selection
   if (state === "dna_summary") {
-    log(`  [${ts()}] dna_summary — clicking Let's go to load sidebar nav…`);
+    log(`  [${ts()}] dna_summary — clicking Let's go to enter main app…`);
     await page.locator("button.bottom-button").first().click({ timeout: 10_000 });
     await sleep(2000);
     state = await detectState(page);
     log(`  [${ts()}] state after Let's go: ${state}`);
+  }
+
+  // section_selection → click first option card → content_ready (sidebar available)
+  if (state === "section_selection") {
+    log(`  [${ts()}] section_selection — clicking first option card to reach content_ready…`);
+    await page.locator(".option-card").first().click({ timeout: 10_000 });
+    log(`  [${ts()}] waiting for section modal to close…`);
+    await page.waitForFunction(() => !document.querySelector(".option-card"), { timeout: 3 * 60 * 1000 });
+    await sleep(2000);
+    state = await detectState(page);
+    log(`  [${ts()}] state after card click: ${state}`);
   }
 
   log(`  [${ts()}] existing brand detected — navigating to DNA Overview to reset…`);
