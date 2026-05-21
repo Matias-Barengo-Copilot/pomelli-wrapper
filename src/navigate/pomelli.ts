@@ -118,6 +118,16 @@ export async function deleteBrandIfPresent(
     }
   }
 
+  // On the dna_summary page the left nav sidebar is not rendered — it only
+  // appears after entering the main Pomelli app. Click "Let's go" first.
+  if (state === "dna_summary") {
+    log(`  [${ts()}] dna_summary — clicking Let's go to load sidebar nav…`);
+    await page.locator("button.bottom-button").first().click({ timeout: 10_000 });
+    await sleep(2000);
+    state = await detectState(page);
+    log(`  [${ts()}] state after Let's go: ${state}`);
+  }
+
   log(`  [${ts()}] existing brand detected — navigating to DNA Overview to reset…`);
   await navigateToBusinessDnaOverview(page, log);
 
