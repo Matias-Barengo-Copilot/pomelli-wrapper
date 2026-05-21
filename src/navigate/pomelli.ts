@@ -93,10 +93,7 @@ export async function deleteBrandIfPresent(
   }
 
   // DNA generation page has no sidebar — we can't navigate to Overview while it runs.
-  // Also handles the edge case where the page text changed mid-generation so detectState
-  // fell through to "content_ready" even though we're still on the generation screen
-  // (detectable by the absence of button.expand-button).
-  if (state === "generating_dna" || !(await page.locator("button.expand-button").count() > 0)) {
+  if (state === "generating_dna") {
     log(`  [${ts()}] DNA generation in progress (or no sidebar) — waiting for it to complete…`);
     let dotsEmitted = false;
     const genDeadline = Date.now() + 15 * 60 * 1000;
@@ -216,19 +213,23 @@ export async function navigateToBusinessDnaOverview(
   return navigateToBusinessDnaSubTab(page, "Overview", log);
 }
 
-/** Expand the sidebar if it is currently collapsed. */
+/** Expand the sidebar if it is currently collapsed. No-op if already expanded or no expand button exists. */
 async function ensureSidebarExpanded(page: Page, log: (msg: string) => void): Promise<void> {
-  const isExpanded = await page.locator("nav.nav-container.expanded").count() > 0;
-  log(`  [${ts()}] sidebar expanded: ${isExpanded}`);
-  if (!isExpanded) {
-    log(`  [${ts()}] waiting for button.expand-button to appear…`);
-    // After DNA generation the sidebar may still be rendering — wait up to 15s
-    await page.locator("button.expand-button").first().waitFor({ state: "visible", timeout: 15_000 });
-    log(`  [${ts()}] expanding sidebar…`);
-    await page.locator("button.expand-button").first().click({ force: true, timeout: 5_000 });
-    await sleep(700);
-    log(`  [${ts()}] ✓ sidebar expanded`);
+  const isExpanded      = await page.locator("nav.nav-container.expanded").count() > 0;
+  const hasExpandButton = await page.locator("button.expand-button").count() > 0;
+  log(`  [${ts()}] sidebar expanded: ${isExpanded}, expand button present: ${hasExpandButton}`);
+
+  if (isExpanded || !hasExpandButton) {
+    // Already open, or sidebar is always visible (headless/wide viewport — no toggle needed)
+    log(`  [${ts()}] sidebar already open — skipping expand`);
+    return;
   }
+
+  log(`  [${ts()}] waiting for button.expand-button to appear…`);
+  await page.locator("button.expand-button").first().waitFor({ state: "visible", timeout: 15_000 });
+  await page.locator("button.expand-button").first().click({ force: true, timeout: 5_000 });
+  await sleep(700);
+  log(`  [${ts()}] ✓ sidebar expanded`);
 }
 
 /**
