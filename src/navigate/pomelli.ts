@@ -186,6 +186,8 @@ export async function navigateToBusinessDnaSubTab(
   await ensureSidebarExpanded(page, log);
 
   // Expand the Business DNA nav group (reveals sub-items: Overview, Catalog, Assets)
+  log(`  [${ts()}] waiting for div.nav-group.has-flyout…`);
+  await page.locator("div.nav-group.has-flyout").first().waitFor({ state: "visible", timeout: 10_000 });
   log(`  [${ts()}] clicking div.nav-group.has-flyout to expand Business DNA sub-items…`);
   await page.locator("div.nav-group.has-flyout").first().click({ force: true, timeout: 5_000 });
   await sleep(500);

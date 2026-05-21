@@ -76,7 +76,12 @@ export async function runWrap(opts: RunWrapOptions): Promise<RunManifest> {
   log(`Mode:     ${headless ? "headless" : "headed"}\n`);
 
   const browser = await chromium.launch({ headless, slowMo: headless ? 0 : 80 });
-  const context = await browser.newContext({ storageState: sessionPath });
+  const context = await browser.newContext({
+    storageState: sessionPath,
+    // Explicit desktop viewport — ensures Pomelli renders the full sidebar nav
+    // (Angular Material sidenav collapses below ~960px)
+    viewport: { width: 1440, height: 900 },
+  });
   const page    = await context.newPage();
 
   const captures: SectionCapture[] = [];
